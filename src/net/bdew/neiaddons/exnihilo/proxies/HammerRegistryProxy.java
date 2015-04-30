@@ -14,13 +14,10 @@ import net.bdew.neiaddons.utils.TypedField;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class HammerRegistryProxy {
-    private static TypedField<List> f_rewards;
+    private static TypedField<HashMap> f_rewards;
     public static List<ItemStack> hammers = new ArrayList<ItemStack>();
     public static Class<? extends Item> clsBaseHammer;
     public static Set<Item> sourceIds;
@@ -28,13 +25,18 @@ public class HammerRegistryProxy {
 
     @SuppressWarnings("unchecked")
     public static List<SmashableProxy> getRegistry() {
-        return new ProxyListView<SmashableProxy>(f_rewards.get(null), SmashableProxy.class);
+        Collection<ArrayList<Object>> vals = f_rewards.get(null).values();
+        ArrayList<Object> allSmashable = new ArrayList<Object>();
+        for (ArrayList<Object> x : vals) {
+            allSmashable.addAll(x);
+        }
+        return new ProxyListView<SmashableProxy>(allSmashable, SmashableProxy.class);
     }
 
     @SuppressWarnings("unchecked")
     public static void init() throws ClassNotFoundException, NoSuchFieldException {
         Class<?> c_HammerRegistry = Utils.getAndCheckClass("exnihilo.registries.HammerRegistry", Object.class);
-        f_rewards = TypedField.from(c_HammerRegistry, "rewards", List.class);
+        f_rewards = TypedField.fromPrivate(c_HammerRegistry, "rewards", HashMap.class);
 
         clsBaseHammer = Utils.getAndCheckClass("exnihilo.items.hammers.ItemHammerBase", Item.class);
 

@@ -36,4 +36,10 @@ public class TypedField<T> {
     public static <R> TypedField<R> from(Class<?> cls, String name, Class<R> result) throws NoSuchFieldException {
         return new TypedField<R>(cls.getField(name), result);
     }
+
+    public static <R> TypedField<R> fromPrivate(Class<?> cls, String name, Class<R> result) throws NoSuchFieldException {
+        Field fld = cls.getDeclaredField(name);
+        fld.setAccessible(true);
+        return new TypedField<R>(fld, result);
+    }
 }
